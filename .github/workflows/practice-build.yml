@@ -1,0 +1,49 @@
+name: Practice build (Windows)
+
+# The fork's test builds: Desktop Melee for Windows, packaged as the releases
+# are (desktop-melee/package_windows.sh, in MSYS2's UCRT64 shell), from any
+# branch but main. The zip is uploaded as this run's artifact; nothing is
+# published. No game data is involved: the player brings their own disc.
+on:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Desktop Melee (Windows, x86_64)
+    runs-on: windows-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-libusb
+
+      - name: Build and package
+        run: desktop-melee/package_windows.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-melee-windows-x86_64
+          path: dist/Desktop-Melee-*-windows-x86_64.zip
+          if-no-files-found: error
