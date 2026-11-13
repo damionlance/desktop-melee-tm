@@ -52,6 +52,12 @@ void desktop_melee_set_cpu_tech(int mode) {
 void desktop_melee_set_cpu_mash(int mode) {
     (void)mode;
 }
+void desktop_melee_set_cpu_escape(int mode) {
+    (void)mode;
+}
+void desktop_melee_set_quick_reset(bool on) {
+    (void)on;
+}
 
 static void test_defaults(void) {
     DesktopMeleeSettings s;
@@ -71,6 +77,7 @@ static void test_defaults(void) {
     assert(s.menu_sounds && !s.onboarding_done && s.disc_path[0] == '\0');
     assert(s.cpu_di == DESKTOP_MELEE_DI_OFF && s.cpu_tech == DESKTOP_MELEE_TECH_OFF);
     assert(s.cpu_mash == DESKTOP_MELEE_MASH_OFF);
+    assert(s.cpu_escape == DESKTOP_MELEE_ESCAPE_OFF && s.quick_reset);
 }
 
 static void test_parse(void) {
@@ -88,11 +95,14 @@ static void test_parse(void) {
                                                       "display.size = 10\n"  /* clamped to 50 */
                                                       "practice.di = survival\n"
                                                       "practice.tech = mix\n"
+                                                      "practice.escape = dodge\n"
+                                                      "practice.reset = false\n"
                                                       "practice.mash = sometimes\n" /* ignored */
                                                       "display.timer = sideways\n"  /* ignored */
                                                       "unknown.key = 1\n"           /* ignored */
                                                       "no equals sign\n");
-    assert(keys == 11);
+    assert(keys == 13);
+    assert(s.cpu_escape == DESKTOP_MELEE_ESCAPE_DODGE && !s.quick_reset);
     assert(s.cpu_di == DESKTOP_MELEE_DI_SURVIVAL && s.cpu_tech == DESKTOP_MELEE_TECH_MIX);
     assert(s.cpu_mash == DESKTOP_MELEE_MASH_OFF);
     assert(s.match.players[1].cpu == 1 && s.match.players[1].cpu_level == 3);
@@ -124,6 +134,9 @@ static void test_round_trip(void) {
     a.cpu_di = DESKTOP_MELEE_DI_OUT;
     a.cpu_tech = DESKTOP_MELEE_TECH_IN;
     a.cpu_mash = DESKTOP_MELEE_MASH_HIGH;
+    a.cpu_di = DESKTOP_MELEE_DI_SLIGHT_OUT;
+    a.cpu_escape = DESKTOP_MELEE_ESCAPE_DODGE;
+    a.quick_reset = false;
     snprintf(a.disc_path, sizeof a.disc_path, "%s", "/home/player/Melee (USA).iso");
     a.disc_size = 1459978240LL;
     a.disc_mtime = 1793636428LL;
@@ -145,6 +158,7 @@ static void test_round_trip(void) {
     assert(a.menu_sounds == b.menu_sounds && a.onboarding_done == b.onboarding_done);
     assert(a.start_on_controller == b.start_on_controller);
     assert(a.cpu_di == b.cpu_di && a.cpu_tech == b.cpu_tech && a.cpu_mash == b.cpu_mash);
+    assert(a.cpu_escape == b.cpu_escape && a.quick_reset == b.quick_reset);
     assert(strcmp(a.disc_path, b.disc_path) == 0);
     assert(a.disc_size == b.disc_size && a.disc_mtime == b.disc_mtime);
 }

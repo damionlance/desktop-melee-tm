@@ -4,6 +4,7 @@
 #include "pc/pc.h"
 #include "pc/slp.h"
 #include "pc/widescreen.h"
+#include "desktop_melee_game.h"
 #endif
 
 #include "gm_1A36.h"
@@ -430,6 +431,8 @@ void gm_801A4D34(void (*on_frame)(void), GameSceneInfo* info)
              * from one hand-off). The tick still runs, so pads are consumed
              * and GObjs animate, but the decision is made once. */
             void (*frame_fn)(void) = s_scene_end_held != 0 ? NULL : on_frame;
+            /* desktop-melee: quick reset (D-pad down), between ticks. */
+            desktop_melee_practice_tick();
             pc_net_sync();
             gm_RunSimTick(frame_fn, temp_r25);
             /* Finish rollback / sync-test re-simulation before gating the exit,

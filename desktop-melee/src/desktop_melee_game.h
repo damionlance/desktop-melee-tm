@@ -43,16 +43,18 @@ int desktop_melee_take_pause_request(void);
 /* desktop-melee/game/gmdesktopmelee.c: whether a VS pause is on. */
 bool desktop_melee_game_paused(void);
 
-/* CPU practice (Players tab): how CPU players react when hit, so a human
- * can practice combos and chaingrabs on them. Off leaves Melee's own CPU.
+/* CPU practice (Match tab): how CPU players react when hit, so a human can
+ * practice combos and chaingrabs on them. Off leaves Melee's own CPU.
  * Applies immediately. (desktop-melee/game/desktop_melee_cpu_practice.c) */
 enum {
-    DESKTOP_MELEE_DI_OFF = 0,      /* Melee's own: CPUs don't DI */
-    DESKTOP_MELEE_DI_IN = 1,       /* toward the attacker */
-    DESKTOP_MELEE_DI_OUT = 2,      /* away from the attacker */
-    DESKTOP_MELEE_DI_SURVIVAL = 3, /* perpendicular, up and toward the stage */
-    DESKTOP_MELEE_DI_MIX = 4,      /* one of the above at random, per hit */
-    DESKTOP_MELEE_DI_COUNT = 5
+    DESKTOP_MELEE_DI_OFF = 0,        /* Melee's own: CPUs don't DI */
+    DESKTOP_MELEE_DI_IN = 1,         /* full, toward the attacker */
+    DESKTOP_MELEE_DI_OUT = 2,        /* full, away from the attacker */
+    DESKTOP_MELEE_DI_SLIGHT_IN = 3,  /* half stick, toward the attacker */
+    DESKTOP_MELEE_DI_SLIGHT_OUT = 4, /* half stick, away from the attacker */
+    DESKTOP_MELEE_DI_SURVIVAL = 5,   /* perpendicular, up and toward the stage */
+    DESKTOP_MELEE_DI_MIX = 6,        /* per hit: none, in, out, slight in or out */
+    DESKTOP_MELEE_DI_COUNT = 7
 };
 enum {
     DESKTOP_MELEE_TECH_OFF = 0, /* Melee's own: CPUs rarely tech */
@@ -70,12 +72,24 @@ enum {
     DESKTOP_MELEE_MASH_HIGH = 3,
     DESKTOP_MELEE_MASH_COUNT = 4
 };
+/* What a CPU does once it can act again after being hit (out of hitstun,
+ * a tech, or a missed tech after getting up). */
+enum {
+    DESKTOP_MELEE_ESCAPE_OFF = 0,   /* Melee's own CPU decides */
+    DESKTOP_MELEE_ESCAPE_DODGE = 1, /* spot dodge on the ground, air dodge in the air */
+    DESKTOP_MELEE_ESCAPE_COUNT = 2
+};
 int desktop_melee_cpu_di(void);
 void desktop_melee_set_cpu_di(int mode);
 int desktop_melee_cpu_tech(void);
 void desktop_melee_set_cpu_tech(int mode);
 int desktop_melee_cpu_mash(void);
 void desktop_melee_set_cpu_mash(int mode);
+int desktop_melee_cpu_escape(void);
+void desktop_melee_set_cpu_escape(int mode);
+/* A random number for practice choices, from outside the game state: a
+ * reset rewinds the game, and Mix should not repeat itself after one. */
+unsigned desktop_melee_practice_random(void);
 /* Hooks from the decompiled fighter code, gobj a Fighter_GObj*.
  * src/melee/ft/fighter.c, after the CPU's own inputs for the frame: */
 void desktop_melee_cpu_practice_frame(void* gobj);
@@ -84,6 +98,20 @@ int desktop_melee_cpu_tech_override(void* gobj);
 /* ftCo_PassiveStand.c's tech roll: -1 Melee decides (stick), 0 no roll (tech
  * in place), else the motion state to roll with. */
 int desktop_melee_cpu_tech_roll(void* gobj);
+
+/* Quick reset (Match tab): D-pad down on any controller puts the match back
+ * the way it was when it started (positions, percents, stocks), from a
+ * snapshot taken when the fighters could first move.
+ * desktop-melee/src/practice_reset.c; the snapshot is melee-pc's rollback one. */
+bool desktop_melee_quick_reset(void);
+void desktop_melee_set_quick_reset(bool on);
+/* src/melee/gm/gmscene.c, between ticks: take the snapshot, or restore it. */
+void desktop_melee_practice_tick(void);
+/* desktop-melee/game/desktop_melee_cpu_practice.c, for the tick: every
+ * fighter is standing and can move (the match has started) ... */
+bool desktop_melee_practice_fighters_ready(void);
+/* ... and D-pad down was pressed on some controller in the last tick. */
+bool desktop_melee_practice_reset_pressed(void);
 
 /* Timer (Display tab): at the top at desktop_melee_timer_scale() of Melee's size, or
  * hidden (the last-seconds countdown too). Applies immediately. */

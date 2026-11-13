@@ -76,9 +76,19 @@
                     <span id="pr-mash-value" class="value">Off</span>
                     <div id="pr-mash-plus" class="step"><img src="icons/plus.png" /></div>
                 </div>
+                <div class="row">
+                    <img class="icon" src="icons/arrow.up.circle.png" /><span class="name">After hitstun</span>
+                    <div id="pr-escape-minus" class="step"><img src="icons/minus.png" /></div>
+                    <span id="pr-escape-value" class="value">Off</span>
+                    <div id="pr-escape-plus" class="step"><img src="icons/plus.png" /></div>
+                </div>
+                <div class="row">
+                    <img class="icon" src="icons/arrow.counterclockwise.png" /><span class="name">D-pad down resets</span>
+                    <div id="quick-reset" class="toggle"><div class="knob"></div></div>
+                </div>
                 <p id="practice-note" class="note">How CPUs react when you hit them. Off is Melee's own CPU.</p>
             </div>
-            <p class="note faint">CPU practice applies right away.</p>
+            <p class="note faint">CPU practice applies right away. A reset goes back to the start of the match, as it was when the fighters could first move.</p>
 
             <p class="label">Time-out</p>
             <div class="box">

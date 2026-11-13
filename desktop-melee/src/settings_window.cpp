@@ -333,19 +333,28 @@ void refresh_match() {
 
 /* ---- CPU practice (Match tab) -------------------------------------------- */
 
-const char* const kDiLabels[DESKTOP_MELEE_DI_COUNT] = {"Off", "In", "Out", "Survival", "Mix"};
+const char* const kDiLabels[DESKTOP_MELEE_DI_COUNT] = {
+    "Off", "In", "Out", "Slight in", "Slight out", "Survival", "Mix"};
 const char* const kTechLabels[DESKTOP_MELEE_TECH_COUNT] = {
     "Off", "In place", "Roll in", "Roll out", "Miss", "Mix"};
 const char* const kMashLabels[DESKTOP_MELEE_MASH_COUNT] = {"Off", "Low", "Medium", "High"};
+const char* const kEscapeLabels[DESKTOP_MELEE_ESCAPE_COUNT] = {"Off", "Dodge"};
 
 std::string practice_note() {
     const DesktopMeleeSettings& s = settings();
     if (s.cpu_di == DESKTOP_MELEE_DI_OFF && s.cpu_tech == DESKTOP_MELEE_TECH_OFF &&
-        s.cpu_mash == DESKTOP_MELEE_MASH_OFF)
+        s.cpu_mash == DESKTOP_MELEE_MASH_OFF && s.cpu_escape == DESKTOP_MELEE_ESCAPE_OFF)
     {
         return "How CPUs react when you hit them. Off is Melee's own CPU.";
     }
-    if (s.cpu_di == DESKTOP_MELEE_DI_MIX || s.cpu_tech == DESKTOP_MELEE_TECH_MIX) {
+    if (s.cpu_escape == DESKTOP_MELEE_ESCAPE_DODGE) {
+        return "Spot or air dodge on the first frame CPUs can act: if your follow-up still "
+               "hits, it's true.";
+    }
+    if (s.cpu_di == DESKTOP_MELEE_DI_MIX) {
+        return "Mix DI picks none, in, out, slight in or slight out for every hit.";
+    }
+    if (s.cpu_tech == DESKTOP_MELEE_TECH_MIX) {
         return "Mix picks again at random for every hit.";
     }
     return "In and out are toward and away from whoever hit the CPU.";
@@ -356,6 +365,8 @@ void refresh_practice() {
     set_text("pr-di-value", kDiLabels[s.cpu_di]);
     set_text("pr-tech-value", kTechLabels[s.cpu_tech]);
     set_text("pr-mash-value", kMashLabels[s.cpu_mash]);
+    set_text("pr-escape-value", kEscapeLabels[s.cpu_escape]);
+    set_toggle("quick-reset", s.quick_reset);
     set_text("practice-note", practice_note());
 }
 
@@ -376,6 +387,12 @@ bool click_practice(const std::string& id) {
     } else if (id == "pr-mash-minus" || id == "pr-mash-plus") {
         s.cpu_mash = cycle(s.cpu_mash, delta, DESKTOP_MELEE_MASH_COUNT);
         desktop_melee_set_cpu_mash(s.cpu_mash);
+    } else if (id == "pr-escape-minus" || id == "pr-escape-plus") {
+        s.cpu_escape = cycle(s.cpu_escape, delta, DESKTOP_MELEE_ESCAPE_COUNT);
+        desktop_melee_set_cpu_escape(s.cpu_escape);
+    } else if (id == "quick-reset") {
+        s.quick_reset = !s.quick_reset;
+        desktop_melee_set_quick_reset(s.quick_reset);
     } else {
         return false;
     }

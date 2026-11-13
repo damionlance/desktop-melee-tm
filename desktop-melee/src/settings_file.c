@@ -37,6 +37,8 @@ void desktop_melee_settings_defaults(DesktopMeleeSettings* settings) {
     settings->cpu_di = DESKTOP_MELEE_DI_OFF;
     settings->cpu_tech = DESKTOP_MELEE_TECH_OFF;
     settings->cpu_mash = DESKTOP_MELEE_MASH_OFF;
+    settings->cpu_escape = DESKTOP_MELEE_ESCAPE_OFF;
+    settings->quick_reset = true;
     snprintf(settings->pause_key, sizeof settings->pause_key, "%s", "ctrl+alt+M");
     settings->menu_sounds = true;
 }
@@ -82,10 +84,12 @@ static bool player_key(const char* key, const char* prefix, int* player, const c
 
 /* Applies one key; returns whether it was understood. */
 /* practice.*: the DESKTOP_MELEE_DI_*, _TECH_* and _MASH_* names, in order. */
-static const char* const di_names[DESKTOP_MELEE_DI_COUNT] = {"off", "in", "out", "survival", "mix"};
+static const char* const di_names[DESKTOP_MELEE_DI_COUNT] = {
+    "off", "in", "out", "slight-in", "slight-out", "survival", "mix"};
 static const char* const tech_names[DESKTOP_MELEE_TECH_COUNT] = {
     "off", "place", "in", "out", "miss", "mix"};
 static const char* const mash_names[DESKTOP_MELEE_MASH_COUNT] = {"off", "low", "medium", "high"};
+static const char* const escape_names[DESKTOP_MELEE_ESCAPE_COUNT] = {"off", "dodge"};
 
 static bool parse_name(const char* value, const char* const* names, int count, int* out) {
     for (int i = 0; i < count; i++) {
@@ -180,6 +184,10 @@ static bool parse_entry(DesktopMeleeSettings* s, const char* key, const char* va
         return parse_name(value, tech_names, DESKTOP_MELEE_TECH_COUNT, &s->cpu_tech);
     } else if (strcmp(key, "practice.mash") == 0) {
         return parse_name(value, mash_names, DESKTOP_MELEE_MASH_COUNT, &s->cpu_mash);
+    } else if (strcmp(key, "practice.escape") == 0) {
+        return parse_name(value, escape_names, DESKTOP_MELEE_ESCAPE_COUNT, &s->cpu_escape);
+    } else if (strcmp(key, "practice.reset") == 0 && parse_bool(value, &b)) {
+        s->quick_reset = b;
     } else if (strcmp(key, "display.screen") == 0) {
         snprintf(s->screen, sizeof s->screen, "%s", value);
     } else if (strcmp(key, "match.stocks") == 0 && parse_long(value, &n)) {
@@ -296,6 +304,9 @@ size_t desktop_melee_settings_format(const DesktopMeleeSettings* s, char* out, s
     EMIT("practice.di = %s\n", name_of(di_names, DESKTOP_MELEE_DI_COUNT, s->cpu_di));
     EMIT("practice.tech = %s\n", name_of(tech_names, DESKTOP_MELEE_TECH_COUNT, s->cpu_tech));
     EMIT("practice.mash = %s\n", name_of(mash_names, DESKTOP_MELEE_MASH_COUNT, s->cpu_mash));
+    EMIT(
+        "practice.escape = %s\n", name_of(escape_names, DESKTOP_MELEE_ESCAPE_COUNT, s->cpu_escape));
+    EMIT("practice.reset = %s\n", bool_text(s->quick_reset));
     EMIT("match.stocks = %d\n", s->match.stocks);
     EMIT("match.minutes = %d\n", s->match.time_seconds / 60);
     EMIT("match.startOnController = %s\n", bool_text(s->start_on_controller));
@@ -393,4 +404,6 @@ void desktop_melee_settings_apply(const DesktopMeleeSettings* s) {
     desktop_melee_set_cpu_di(s->cpu_di);
     desktop_melee_set_cpu_tech(s->cpu_tech);
     desktop_melee_set_cpu_mash(s->cpu_mash);
+    desktop_melee_set_cpu_escape(s->cpu_escape);
+    desktop_melee_set_quick_reset(s->quick_reset);
 }

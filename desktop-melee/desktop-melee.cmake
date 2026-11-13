@@ -1,6 +1,7 @@
 # desktop-melee additions, included from the root CMakeLists.txt after the melee
 # target. Our code lives in desktop-melee/; upstream files only get small hooks.
 target_sources(melee PRIVATE desktop-melee/src/desktop_melee.c desktop-melee/src/assets.c
+        desktop-melee/src/practice_reset.c
         desktop-melee/src/gctex.c desktop-melee/src/disc_check.cpp)
 
 # The disc check's command-line tester (desktop-melee/tests/disc_check_test.sh builds it).

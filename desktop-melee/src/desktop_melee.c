@@ -4,6 +4,7 @@
 #include <math.h>
 #include <signal.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "pc/pc.h"
@@ -290,6 +291,31 @@ int desktop_melee_cpu_mash(void) {
 }
 void desktop_melee_set_cpu_mash(int mode) {
     s_cpu_mash = clamp_mode(mode, DESKTOP_MELEE_MASH_COUNT);
+}
+static int s_cpu_escape = DESKTOP_MELEE_ESCAPE_OFF;
+int desktop_melee_cpu_escape(void) {
+    return s_cpu_escape;
+}
+void desktop_melee_set_cpu_escape(int mode) {
+    s_cpu_escape = clamp_mode(mode, DESKTOP_MELEE_ESCAPE_COUNT);
+}
+static bool s_quick_reset = true;
+bool desktop_melee_quick_reset(void) {
+    return s_quick_reset;
+}
+void desktop_melee_set_quick_reset(bool on) {
+    s_quick_reset = on;
+}
+/* xorshift32, seeded from the clock on first use. */
+unsigned desktop_melee_practice_random(void) {
+    static uint32_t state;
+    if (state == 0) {
+        state = (uint32_t)SDL_GetTicksNS() | 1u;
+    }
+    state ^= state << 13;
+    state ^= state >> 17;
+    state ^= state << 5;
+    return state;
 }
 
 static int s_timer_mode = DESKTOP_MELEE_TIMER_TOP;

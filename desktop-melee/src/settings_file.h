@@ -34,6 +34,8 @@ typedef struct DesktopMeleeSettings {
     int cpu_di;                                 /* practice.di: DESKTOP_MELEE_DI_* */
     int cpu_tech;                               /* practice.tech: DESKTOP_MELEE_TECH_* */
     int cpu_mash;                               /* practice.mash: DESKTOP_MELEE_MASH_* */
+    int cpu_escape;                             /* practice.escape: DESKTOP_MELEE_ESCAPE_* */
+    bool quick_reset;                           /* practice.reset */
     bool menu_sounds;                           /* sound.menu */
     bool onboarding_done;                       /* onboarding.done */
     char disc_path[1024];                       /* disc.verified.path; "" = none */
