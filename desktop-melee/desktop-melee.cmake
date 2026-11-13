@@ -14,7 +14,8 @@ target_include_directories(melee PRIVATE desktop-melee/src)
 # includes our game mode (GM_DESKTOP_MELEE), which is built as game code too.
 target_include_directories(melee_game PRIVATE desktop-melee/src desktop-melee/game)
 target_sources(melee_game PRIVATE desktop-melee/game/gmdesktopmelee.c
-        desktop-melee/game/desktop_melee_assets.c desktop-melee/game/desktop_melee_platforms.c)
+        desktop-melee/game/desktop_melee_assets.c desktop-melee/game/desktop_melee_platforms.c
+        desktop-melee/game/desktop_melee_cpu_practice.c)
 
 # One implementation of desktop-melee/src/platform.h per system
 # (docs/desktop-melee/porting.md). Windows and Linux are skeletons that run

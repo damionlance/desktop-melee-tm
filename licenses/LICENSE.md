@@ -77,9 +77,11 @@ change is tagged `desktop-melee` in a comment and listed in
   `extern/aurora/lib/rmlui.hpp`; and adds `extern/aurora/lib/rmlui_window.cpp`.
 - Game code (section 1, still not licensed; the hooks are small and marked):
   `src/melee/cm/camera.c`, `src/melee/ft/fighter.c`,
+  `src/melee/ft/kinds/ftCommon/ftCo_DownAttack.c`,
   `src/melee/ft/kinds/ftCommon/ftCo_Jump.c`,
   `src/melee/ft/kinds/ftCommon/ftCo_JumpAerial.c`,
-  `src/melee/ft/kinds/ftCommon/ftCo_JumpAerialF1.c`, `src/melee/gm/forward.h`,
+  `src/melee/ft/kinds/ftCommon/ftCo_JumpAerialF1.c`,
+  `src/melee/ft/kinds/ftCommon/ftCo_PassiveStand.c`, `src/melee/gm/forward.h`,
   `src/melee/gm/gmboot.c`, `src/melee/gm/gmscdata.c`, `src/melee/gm/gmvs.c`,
   `src/melee/gm/gmvsmode.c` (a developer-only character override),
   `src/melee/gr/grdisplay.c`, `src/melee/gr/ground.c`, `src/melee/if/ifall.c`,

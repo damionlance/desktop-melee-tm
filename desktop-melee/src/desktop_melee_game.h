@@ -43,6 +43,48 @@ int desktop_melee_take_pause_request(void);
 /* desktop-melee/game/gmdesktopmelee.c: whether a VS pause is on. */
 bool desktop_melee_game_paused(void);
 
+/* CPU practice (Players tab): how CPU players react when hit, so a human
+ * can practice combos and chaingrabs on them. Off leaves Melee's own CPU.
+ * Applies immediately. (desktop-melee/game/desktop_melee_cpu_practice.c) */
+enum {
+    DESKTOP_MELEE_DI_OFF = 0,      /* Melee's own: CPUs don't DI */
+    DESKTOP_MELEE_DI_IN = 1,       /* toward the attacker */
+    DESKTOP_MELEE_DI_OUT = 2,      /* away from the attacker */
+    DESKTOP_MELEE_DI_SURVIVAL = 3, /* perpendicular, up and toward the stage */
+    DESKTOP_MELEE_DI_MIX = 4,      /* one of the above at random, per hit */
+    DESKTOP_MELEE_DI_COUNT = 5
+};
+enum {
+    DESKTOP_MELEE_TECH_OFF = 0, /* Melee's own: CPUs rarely tech */
+    DESKTOP_MELEE_TECH_PLACE = 1,
+    DESKTOP_MELEE_TECH_IN = 2,  /* roll toward the attacker */
+    DESKTOP_MELEE_TECH_OUT = 3, /* roll away from the attacker */
+    DESKTOP_MELEE_TECH_MISS = 4,
+    DESKTOP_MELEE_TECH_MIX = 5, /* one of the four at random, per hit */
+    DESKTOP_MELEE_TECH_COUNT = 6
+};
+enum {
+    DESKTOP_MELEE_MASH_OFF = 0, /* Melee's own grab escape */
+    DESKTOP_MELEE_MASH_LOW = 1,
+    DESKTOP_MELEE_MASH_MEDIUM = 2,
+    DESKTOP_MELEE_MASH_HIGH = 3,
+    DESKTOP_MELEE_MASH_COUNT = 4
+};
+int desktop_melee_cpu_di(void);
+void desktop_melee_set_cpu_di(int mode);
+int desktop_melee_cpu_tech(void);
+void desktop_melee_set_cpu_tech(int mode);
+int desktop_melee_cpu_mash(void);
+void desktop_melee_set_cpu_mash(int mode);
+/* Hooks from the decompiled fighter code, gobj a Fighter_GObj*.
+ * src/melee/ft/fighter.c, after the CPU's own inputs for the frame: */
+void desktop_melee_cpu_practice_frame(void* gobj);
+/* ftCo_DownAttack.c's tech check: 1 tech, 0 no tech, -1 Melee decides. */
+int desktop_melee_cpu_tech_override(void* gobj);
+/* ftCo_PassiveStand.c's tech roll: -1 Melee decides (stick), 0 no roll (tech
+ * in place), else the motion state to roll with. */
+int desktop_melee_cpu_tech_roll(void* gobj);
+
 /* Timer (Display tab): at the top at desktop_melee_timer_scale() of Melee's size, or
  * hidden (the last-seconds countdown too). Applies immediately. */
 enum { DESKTOP_MELEE_TIMER_TOP = 0, DESKTOP_MELEE_TIMER_HIDDEN = 1 };

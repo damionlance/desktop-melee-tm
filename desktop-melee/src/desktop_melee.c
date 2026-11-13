@@ -265,6 +265,33 @@ bool desktop_melee_shake_enabled(void) {
     return s_shake;
 }
 
+/* ---- CPU practice (Players tab) ------------------------------------------ */
+
+static int s_cpu_di = DESKTOP_MELEE_DI_OFF;
+static int s_cpu_tech = DESKTOP_MELEE_TECH_OFF;
+static int s_cpu_mash = DESKTOP_MELEE_MASH_OFF;
+static int clamp_mode(int mode, int count) {
+    return mode >= 0 && mode < count ? mode : 0;
+}
+int desktop_melee_cpu_di(void) {
+    return s_cpu_di;
+}
+void desktop_melee_set_cpu_di(int mode) {
+    s_cpu_di = clamp_mode(mode, DESKTOP_MELEE_DI_COUNT);
+}
+int desktop_melee_cpu_tech(void) {
+    return s_cpu_tech;
+}
+void desktop_melee_set_cpu_tech(int mode) {
+    s_cpu_tech = clamp_mode(mode, DESKTOP_MELEE_TECH_COUNT);
+}
+int desktop_melee_cpu_mash(void) {
+    return s_cpu_mash;
+}
+void desktop_melee_set_cpu_mash(int mode) {
+    s_cpu_mash = clamp_mode(mode, DESKTOP_MELEE_MASH_COUNT);
+}
+
 static int s_timer_mode = DESKTOP_MELEE_TIMER_TOP;
 void desktop_melee_set_timer_mode(int mode) {
     s_timer_mode = mode == DESKTOP_MELEE_TIMER_HIDDEN ? mode : DESKTOP_MELEE_TIMER_TOP;

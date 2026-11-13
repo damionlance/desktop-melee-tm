@@ -304,6 +304,8 @@ void refresh_pause_key() {
     set_class("pause-key", "hidden", s_pause_key.empty());
 }
 
+void refresh_practice();
+
 void refresh_match() {
     const DesktopMeleeMatchSetup& match = settings().match;
     const int minutes = match.time_seconds / 60;
@@ -315,6 +317,7 @@ void refresh_match() {
     set_class("minutes-plus", "disabled", minutes >= 99);
 
     set_toggle("start-on-controller", settings().start_on_controller);
+    refresh_practice();
 
     const bool active = desktop_melee_match_active();
     set_text("match-start-label", active ? "Restart Match" : "Start Match");
@@ -326,6 +329,60 @@ void refresh_match() {
     set_text("pause-hide-label", hidden ? "Show" : "Pause and hide");
     set_attribute("pause-hide-icon", "src", hidden ? "icons/eye.png" : "icons/eye.slash.png");
     refresh_pause_key();
+}
+
+/* ---- CPU practice (Match tab) -------------------------------------------- */
+
+const char* const kDiLabels[DESKTOP_MELEE_DI_COUNT] = {"Off", "In", "Out", "Survival", "Mix"};
+const char* const kTechLabels[DESKTOP_MELEE_TECH_COUNT] = {
+    "Off", "In place", "Roll in", "Roll out", "Miss", "Mix"};
+const char* const kMashLabels[DESKTOP_MELEE_MASH_COUNT] = {"Off", "Low", "Medium", "High"};
+
+std::string practice_note() {
+    const DesktopMeleeSettings& s = settings();
+    if (s.cpu_di == DESKTOP_MELEE_DI_OFF && s.cpu_tech == DESKTOP_MELEE_TECH_OFF &&
+        s.cpu_mash == DESKTOP_MELEE_MASH_OFF)
+    {
+        return "How CPUs react when you hit them. Off is Melee's own CPU.";
+    }
+    if (s.cpu_di == DESKTOP_MELEE_DI_MIX || s.cpu_tech == DESKTOP_MELEE_TECH_MIX) {
+        return "Mix picks again at random for every hit.";
+    }
+    return "In and out are toward and away from whoever hit the CPU.";
+}
+
+void refresh_practice() {
+    const DesktopMeleeSettings& s = settings();
+    set_text("pr-di-value", kDiLabels[s.cpu_di]);
+    set_text("pr-tech-value", kTechLabels[s.cpu_tech]);
+    set_text("pr-mash-value", kMashLabels[s.cpu_mash]);
+    set_text("practice-note", practice_note());
+}
+
+/* The steppers go round: past the last choice is the first. */
+int cycle(int value, int delta, int count) {
+    return ((value + delta) % count + count) % count;
+}
+
+bool click_practice(const std::string& id) {
+    DesktopMeleeSettings& s = settings();
+    const int delta = id.size() > 5 && id.compare(id.size() - 5, 5, "-plus") == 0 ? 1 : -1;
+    if (id == "pr-di-minus" || id == "pr-di-plus") {
+        s.cpu_di = cycle(s.cpu_di, delta, DESKTOP_MELEE_DI_COUNT);
+        desktop_melee_set_cpu_di(s.cpu_di);
+    } else if (id == "pr-tech-minus" || id == "pr-tech-plus") {
+        s.cpu_tech = cycle(s.cpu_tech, delta, DESKTOP_MELEE_TECH_COUNT);
+        desktop_melee_set_cpu_tech(s.cpu_tech);
+    } else if (id == "pr-mash-minus" || id == "pr-mash-plus") {
+        s.cpu_mash = cycle(s.cpu_mash, delta, DESKTOP_MELEE_MASH_COUNT);
+        desktop_melee_set_cpu_mash(s.cpu_mash);
+    } else {
+        return false;
+    }
+    play_sound(SOUND_MOVE);
+    desktop_melee_settings_save();
+    refresh_practice();
+    return true;
 }
 
 /* Steps a value within [lo, hi]; the denied sound at the ends. */
@@ -1052,8 +1109,8 @@ public:
             flush_saves(true);
             desktop_melee_request_quit();
         } else {
-            click_match(id) || click_players(id) || click_controls(id) || click_sound(id) ||
-                click_display(id);
+            click_practice(id) || click_match(id) || click_players(id) || click_controls(id) ||
+                click_sound(id) || click_display(id);
         }
     }
 };

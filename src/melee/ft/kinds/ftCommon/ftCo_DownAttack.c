@@ -15,6 +15,9 @@
 #include <melee/ft/types.h>
 #include <melee/it/types.h>
 #include <sysdolphin/baselib/gobj.h>
+#ifdef TARGET_PC
+#include "desktop_melee_game.h"
+#endif
 
 /** @details Summed with ::Item::xBEC in ::it_80271B60; seems to describe an
  * upward expansion along the Y-axis and a symmetrical contraction along the
@@ -90,6 +93,15 @@ void ftCo_80098634(Item_FtTrack* track)
 bool ftCo_800986B0(Fighter_GObj* gobj)
 {
     Fighter* fp = GET_FIGHTER(gobj);
+#ifdef TARGET_PC
+    /* desktop-melee: CPU practice teching (Players tab). */
+    {
+        const int tech = desktop_melee_cpu_tech_override(gobj);
+        if (tech >= 0) {
+            return tech == 1 && !ftCo_800C5240(gobj);
+        }
+    }
+#endif
     if (!ftCo_800C5240(gobj) && fp->x680 < p_ftCommonData->x250 &&
         fp->x684 >= p_ftCommonData->x1C)
     {

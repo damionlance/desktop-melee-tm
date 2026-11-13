@@ -43,6 +43,15 @@ void desktop_melee_set_screen(const char* name) {
 void desktop_melee_set_start_starts_match(bool on) {
     (void)on;
 }
+void desktop_melee_set_cpu_di(int mode) {
+    (void)mode;
+}
+void desktop_melee_set_cpu_tech(int mode) {
+    (void)mode;
+}
+void desktop_melee_set_cpu_mash(int mode) {
+    (void)mode;
+}
 
 static void test_defaults(void) {
     DesktopMeleeSettings s;
@@ -60,6 +69,8 @@ static void test_defaults(void) {
     assert(strcmp(s.pause_key, "ctrl+alt+M") == 0);
     assert(!s.start_on_controller);
     assert(s.menu_sounds && !s.onboarding_done && s.disc_path[0] == '\0');
+    assert(s.cpu_di == DESKTOP_MELEE_DI_OFF && s.cpu_tech == DESKTOP_MELEE_TECH_OFF);
+    assert(s.cpu_mash == DESKTOP_MELEE_MASH_OFF);
 }
 
 static void test_parse(void) {
@@ -75,10 +86,15 @@ static void test_parse(void) {
                                                       "match.minutes = 0\n"
                                                       "match.stocks = 500\n" /* clamped to 99 */
                                                       "display.size = 10\n"  /* clamped to 50 */
-                                                      "display.timer = sideways\n" /* ignored */
-                                                      "unknown.key = 1\n"          /* ignored */
+                                                      "practice.di = survival\n"
+                                                      "practice.tech = mix\n"
+                                                      "practice.mash = sometimes\n" /* ignored */
+                                                      "display.timer = sideways\n"  /* ignored */
+                                                      "unknown.key = 1\n"           /* ignored */
                                                       "no equals sign\n");
-    assert(keys == 9);
+    assert(keys == 11);
+    assert(s.cpu_di == DESKTOP_MELEE_DI_SURVIVAL && s.cpu_tech == DESKTOP_MELEE_TECH_MIX);
+    assert(s.cpu_mash == DESKTOP_MELEE_MASH_OFF);
     assert(s.match.players[1].cpu == 1 && s.match.players[1].cpu_level == 3);
     assert(s.match.players[0].ckind == 9);
     assert(s.button_map[0][DESKTOP_MELEE_BTN_Z] == DESKTOP_MELEE_BTN_X);
@@ -105,6 +121,9 @@ static void test_round_trip(void) {
     snprintf(a.pause_key, sizeof a.pause_key, "%s", "ctrl+super+P");
     a.onboarding_done = true;
     a.start_on_controller = true;
+    a.cpu_di = DESKTOP_MELEE_DI_OUT;
+    a.cpu_tech = DESKTOP_MELEE_TECH_IN;
+    a.cpu_mash = DESKTOP_MELEE_MASH_HIGH;
     snprintf(a.disc_path, sizeof a.disc_path, "%s", "/home/player/Melee (USA).iso");
     a.disc_size = 1459978240LL;
     a.disc_mtime = 1793636428LL;
@@ -125,6 +144,7 @@ static void test_round_trip(void) {
     assert(strcmp(a.screen, b.screen) == 0 && strcmp(a.pause_key, b.pause_key) == 0);
     assert(a.menu_sounds == b.menu_sounds && a.onboarding_done == b.onboarding_done);
     assert(a.start_on_controller == b.start_on_controller);
+    assert(a.cpu_di == b.cpu_di && a.cpu_tech == b.cpu_tech && a.cpu_mash == b.cpu_mash);
     assert(strcmp(a.disc_path, b.disc_path) == 0);
     assert(a.disc_size == b.disc_size && a.disc_mtime == b.disc_mtime);
 }

@@ -1721,6 +1721,10 @@ void Fighter_procCpu(Fighter_GObj* gobj)
     Fighter* fp = GET_FIGHTER(gobj);
     if (!fp->is_sleeping && ftCo_IsCpuControlled(fp)) {
         ftCo_800B3900(gobj);
+#ifdef TARGET_PC
+        /* desktop-melee: CPU practice DI and grab mashing (Players tab). */
+        desktop_melee_cpu_practice_frame(gobj);
+#endif
     }
 }
 

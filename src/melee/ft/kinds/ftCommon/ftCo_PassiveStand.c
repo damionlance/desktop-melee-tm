@@ -16,12 +16,28 @@
 #include <melee/ft/ftanim.h>
 #include <melee/ft/ftcommon.h>
 #include <melee/ft/types.h>
+#ifdef TARGET_PC
+#include "desktop_melee_game.h"
+#endif
 
 /* 09855C */ static void ftCo_800989D4(Fighter_GObj* gobj, FtMotionId msid);
 
 bool ftCo_80098928(Fighter_GObj* gobj)
 {
     Fighter* fp = gobj->user_data;
+#ifdef TARGET_PC
+    /* desktop-melee: CPU practice tech rolls (Players tab). */
+    {
+        const int roll = desktop_melee_cpu_tech_roll(gobj);
+        if (roll == 0) {
+            return false; /* in place: ftCo_8009872C techs next */
+        }
+        if (roll > 0 && ftCo_800986B0(gobj)) {
+            ftCo_800989D4(gobj, (FtMotionId) roll);
+            return true;
+        }
+    }
+#endif
     if (ftCo_800986B0(gobj)) {
         if (ABS(fp->input.lstick[0].x) >= p_ftCommonData->x254) {
             FtMotionId msid = fp->input.lstick[0].x * fp->facing_dir >= 0
